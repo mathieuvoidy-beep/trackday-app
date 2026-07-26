@@ -8,19 +8,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - name: Checkout repository
+      - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - name: Install Java
+        uses: actions/setup-java@v4
         with:
-          flutter-version: '3.19.0'
-          channel: 'stable'
+          distribution: 'zulu'
+          java-version: '17'
 
-      - name: Install dependencies
+      - name: Install Flutter directly
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 -b stable _flutter
+          echo "$GITHUB_WORKSPACE/_flutter/bin" >> $GITHUB_PATH
+          flutter doctor
+
+      - name: Get dependencies
         run: flutter pub get
 
       - name: Build APK
